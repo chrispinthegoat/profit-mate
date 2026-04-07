@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { toast } from 'sonner';
 
 const categories = ['food', 'transport', 'rent', 'supplies', 'utilities', 'other'];
 
@@ -28,6 +29,7 @@ const ExpensesPage = () => {
       category: t(category),
       date: getToday(),
     });
+    toast.success(t('recorded'));
     setAmount('');
     setDescription('');
     setCategory('other');
@@ -40,7 +42,7 @@ const ExpensesPage = () => {
         <h2 className="text-xl font-display font-bold text-foreground">{t('allExpenses')}</h2>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button size="sm" className="gradient-secondary border-0 text-secondary-foreground gap-1">
+            <Button size="sm" className="gradient-secondary border-0 text-secondary-foreground gap-1 h-10 px-4">
               <Plus className="w-4 h-4" /> {t('addExpense')}
             </Button>
           </DialogTrigger>
@@ -50,17 +52,17 @@ const ExpensesPage = () => {
             </DialogHeader>
             <div className="space-y-4 mt-2">
               <div>
-                <label className="text-sm font-medium text-foreground">{t('description')}</label>
-                <Input value={description} onChange={e => setDescription(e.target.value)} placeholder={t('description')} className="mt-1" />
+                <label className="text-sm font-medium text-foreground">{t('descriptionExpense')}</label>
+                <Input value={description} onChange={e => setDescription(e.target.value)} placeholder={t('expensePlaceholder')} className="mt-1 h-12 text-base" autoFocus />
               </div>
               <div>
-                <label className="text-sm font-medium text-foreground">{t('amount')} ({state.currency})</label>
-                <Input type="number" value={amount} onChange={e => setAmount(e.target.value)} placeholder="0" className="mt-1" />
+                <label className="text-sm font-medium text-foreground">{t('howMuch')} ({state.currency})</label>
+                <Input type="number" value={amount} onChange={e => setAmount(e.target.value)} placeholder="0" className="mt-1 h-12 text-xl font-display font-bold" inputMode="numeric" />
               </div>
               <div>
                 <label className="text-sm font-medium text-foreground">{t('category')}</label>
                 <Select value={category} onValueChange={setCategory}>
-                  <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                  <SelectTrigger className="mt-1 h-12 text-base"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     {categories.map(c => (
                       <SelectItem key={c} value={c}>{t(c)}</SelectItem>
@@ -69,8 +71,8 @@ const ExpensesPage = () => {
                 </Select>
               </div>
               <div className="flex gap-2">
-                <Button variant="outline" className="flex-1" onClick={() => setOpen(false)}>{t('cancel')}</Button>
-                <Button className="flex-1 gradient-secondary border-0 text-secondary-foreground" onClick={handleAdd}>{t('save')}</Button>
+                <Button variant="outline" className="flex-1 h-12" onClick={() => setOpen(false)}>{t('cancel')}</Button>
+                <Button className="flex-1 h-12 gradient-secondary border-0 text-secondary-foreground font-bold" onClick={handleAdd}>{t('save')} ✓</Button>
               </div>
             </div>
           </DialogContent>
@@ -81,7 +83,8 @@ const ExpensesPage = () => {
         <Card className="border border-border">
           <CardContent className="p-8 text-center">
             <Receipt className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-            <p className="text-muted-foreground">{t('noData')}</p>
+            <p className="text-muted-foreground text-sm">{t('noData')}</p>
+            <p className="text-muted-foreground/70 text-xs mt-1">{t('tapToStart')}</p>
           </CardContent>
         </Card>
       ) : (
@@ -95,7 +98,7 @@ const ExpensesPage = () => {
                 </div>
                 <div className="flex items-center gap-3">
                   <span className="text-sm font-bold text-loss">-{formatCurrency(tx.amount, state.currency)}</span>
-                  <button onClick={() => deleteTransaction(tx.id)} className="text-muted-foreground hover:text-destructive transition-colors">
+                  <button onClick={() => deleteTransaction(tx.id)} className="text-muted-foreground hover:text-destructive transition-colors p-1">
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
