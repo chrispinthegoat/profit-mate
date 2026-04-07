@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { AlertCircle, Star, MessageSquare, CheckCircle2 } from 'lucide-react';
+import { AlertCircle, Star, MessageSquare, CheckCircle2, HelpCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 const FeedbackPage = () => {
@@ -33,7 +33,10 @@ const FeedbackPage = () => {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <h2 className="text-xl font-display font-bold text-foreground">{t('feedback')}</h2>
+      <div className="flex items-center gap-2">
+        <HelpCircle className="w-5 h-5 text-primary" />
+        <h2 className="text-xl font-display font-bold text-foreground">{t('feedback')}</h2>
+      </div>
 
       {/* Report Issue */}
       <Card className="border border-border shadow-sm">
@@ -46,13 +49,13 @@ const FeedbackPage = () => {
         <CardContent className="space-y-3">
           <div>
             <label className="text-sm font-medium text-foreground">{t('issueTitle')}</label>
-            <Input value={issueTitle} onChange={e => setIssueTitle(e.target.value)} placeholder={t('issueTitle')} className="mt-1" />
+            <Input value={issueTitle} onChange={e => setIssueTitle(e.target.value)} placeholder={t('issueTitle')} className="mt-1 h-12 text-base" />
           </div>
           <div>
             <label className="text-sm font-medium text-foreground">{t('issueDescription')}</label>
-            <Textarea value={issueDesc} onChange={e => setIssueDesc(e.target.value)} placeholder={t('issueDescription')} className="mt-1" rows={3} />
+            <Textarea value={issueDesc} onChange={e => setIssueDesc(e.target.value)} placeholder={t('issueDescription')} className="mt-1 text-base" rows={3} />
           </div>
-          <Button className="w-full gradient-primary border-0 text-primary-foreground" onClick={handleIssue}>{t('submit')}</Button>
+          <Button className="w-full h-12 gradient-primary border-0 text-primary-foreground font-bold" onClick={handleIssue}>{t('submit')}</Button>
         </CardContent>
       </Card>
 
@@ -67,17 +70,17 @@ const FeedbackPage = () => {
         <CardContent className="space-y-3">
           <div>
             <label className="text-sm font-medium text-foreground">{t('rateUs')}</label>
-            <div className="flex gap-1 mt-2">
+            <div className="flex gap-2 mt-2">
               {[1, 2, 3, 4, 5].map(i => (
                 <button
                   key={i}
                   onClick={() => setRating(i)}
                   onMouseEnter={() => setHoverRating(i)}
                   onMouseLeave={() => setHoverRating(0)}
-                  className="transition-transform hover:scale-110"
+                  className="transition-transform hover:scale-110 active:scale-95 p-1"
                 >
                   <Star
-                    className={`w-7 h-7 ${
+                    className={`w-8 h-8 ${
                       i <= (hoverRating || rating)
                         ? 'fill-accent text-accent'
                         : 'text-muted-foreground/30'
@@ -89,9 +92,9 @@ const FeedbackPage = () => {
           </div>
           <div>
             <label className="text-sm font-medium text-foreground">{t('review')}</label>
-            <Textarea value={reviewText} onChange={e => setReviewText(e.target.value)} placeholder={t('review')} className="mt-1" rows={3} />
+            <Textarea value={reviewText} onChange={e => setReviewText(e.target.value)} placeholder={t('review')} className="mt-1 text-base" rows={3} />
           </div>
-          <Button className="w-full gradient-secondary border-0 text-secondary-foreground" onClick={handleReview}>{t('submit')}</Button>
+          <Button className="w-full h-12 gradient-secondary border-0 text-secondary-foreground font-bold" onClick={handleReview}>{t('submit')}</Button>
         </CardContent>
       </Card>
     </div>
