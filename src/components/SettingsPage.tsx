@@ -1,8 +1,10 @@
+import { useState } from 'react';
 import { useApp } from '@/contexts/useApp';
 import { Language, languageNames } from '@/lib/i18n';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Check, Crown, Sparkles } from 'lucide-react';
+import { Check, Crown, Sparkles, Phone, Copy, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 
 const plans = [
   {
@@ -30,8 +32,28 @@ const plans = [
 
 const currencies = ['RWF', 'KES', 'UGX', 'TZS', 'BIF', 'USD'];
 
+const ussdCodes = {
+  basic: { mtn: '*182*8*1*PROFITMATE*2000#', airtel: '*185*9*1*PROFITMATE*2000#', amountRWF: '2,000 RWF' },
+  pro: { mtn: '*182*8*1*PROFITMATE*5000#', airtel: '*185*9*1*PROFITMATE*5000#', amountRWF: '5,000 RWF' },
+};
+
 const SettingsPage = () => {
   const { state, t, setLanguage, setPlan, setCurrency } = useApp();
+  const [showUssd, setShowUssd] = useState(false);
+  const [selectedPlanForUssd, setSelectedPlanForUssd] = useState<'basic' | 'pro'>('basic');
+
+  const copyCode = (code: string) => {
+    navigator.clipboard.writeText(code).catch(() => {});
+    toast.success(t('codeCopied'));
+  };
+
+  const handleUpgradeWithUssd = (planKey: 'basic' | 'pro') => {
+    setSelectedPlanForUssd(planKey);
+    setShowUssd(true);
+    setPlan(planKey);
+  };
+
+  const codes = ussdCodes[selectedPlanForUssd];
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -41,7 +63,7 @@ const SettingsPage = () => {
           <CardTitle className="text-base font-display">{t('language')}</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-2 gap-2">
             {(Object.keys(languageNames) as Language[]).map(lang => (
               <button
                 key={lang}
@@ -125,20 +147,143 @@ const SettingsPage = () => {
                   {plan.key === 'free' && (
                     <p className="text-xs text-primary font-medium mb-2">{t('permanentFree')}</p>
                   )}
-                  <Button
-                    size="sm"
-                    className={`w-full ${isActive ? 'bg-muted text-foreground' : 'gradient-primary border-0 text-primary-foreground'}`}
-                    disabled={isActive}
-                    onClick={() => setPlan(plan.key)}
-                  >
-                    {isActive ? t('currentPlan') : t('upgrade')}
-                  </Button>
+                  {plan.key === 'free' ? (
+                    <Button
+                      size="sm"
+                      className={`w-full ${isActive ? 'bg-muted text-foreground' : 'gradient-primary border-0 text-primary-foreground'}`}
+                      disabled={isActive}
+                      onClick={() => setPlan(plan.key)}
+                    >
+                      {isActive ? t('currentPlan') : t('upgrade')}
+                    </Button>
+                  ) : (
+                    <div className="space-y-2">
+                      <Button
+                        size="sm"
+                        className={`w-full ${isActive ? 'bg-muted text-foreground' : 'gradient-primary border-0 text-primary-foreground'}`}
+                        disabled={isActive}
+                        onClick={() => handleUpgradeWithUssd(plan.key as 'basic' | 'pro')}
+                      >
+                        {isActive ? t('currentPlan') : t('upgrade')}
+                      </Button>
+                      {!isActive && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="w-full gap-2 border-accent text-accent-foreground"
+                          onClick={() => handleUpgradeWithUssd(plan.key as 'basic' | 'pro')}
+                        >
+                          <Phone className="w-4 h-4" />
+                          {t('payWithMomo')}
+                        </Button>
+                      )}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             );
           })}
         </div>
       </div>
+
+      {/* USSD Payment Section */}
+      <Card className="border-2 border-accent shadow-md overflow-hidden">
+        <button
+          onClick={() => setShowUssd(!showUssd)}
+          className="w-full"
+        >
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base font-display flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Phone className="w-5 h-5 text-accent" />
+                {t('ussdPayTitle')}
+              </div>
+              {showUssd ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
+            </CardTitle>
+          </CardHeader>
+        </button>
+
+        {showUssd && (
+          <CardContent className="pt-0 space-y-4">
+            <p className="text-sm text-muted-foreground">{t('ussdPayDesc')}</p>
+
+            {/* Plan selector */}
+            <div className="flex gap-2">
+              <button
+                onClick={() => setSelectedPlanForUssd('basic')}
+                className={`flex-1 p-2 rounded-lg text-sm font-medium transition-all ${
+                  selectedPlanForUssd === 'basic'
+                    ? 'gradient-primary text-primary-foreground shadow-md'
+                    : 'bg-muted text-foreground'
+                }`}
+              >
+                {t('basicPlan')} — $2
+              </button>
+              <button
+                onClick={() => setSelectedPlanForUssd('pro')}
+                className={`flex-1 p-2 rounded-lg text-sm font-medium transition-all ${
+                  selectedPlanForUssd === 'pro'
+                    ? 'gradient-primary text-primary-foreground shadow-md'
+                    : 'bg-muted text-foreground'
+                }`}
+              >
+                {t('proPlan')} — $5
+              </button>
+            </div>
+
+            {/* MTN MoMo */}
+            <div className="rounded-xl bg-[hsl(45,90%,95%)] border border-accent/30 p-4 space-y-2">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center">
+                  <span className="text-sm font-bold text-accent-foreground">M</span>
+                </div>
+                <span className="font-display font-bold text-sm text-foreground">{t('ussdMtn')}</span>
+              </div>
+              <button
+                onClick={() => copyCode(codes.mtn)}
+                className="w-full flex items-center justify-between bg-card rounded-lg p-3 border border-border active:scale-[0.98] transition-transform"
+              >
+                <code className="text-base font-bold text-foreground tracking-wide">{codes.mtn}</code>
+                <Copy className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+              </button>
+              <p className="text-xs text-muted-foreground">{t('copyCode')}</p>
+            </div>
+
+            <p className="text-center text-xs text-muted-foreground font-medium">— {t('ussdOr')} —</p>
+
+            {/* Airtel Money */}
+            <div className="rounded-xl bg-destructive/5 border border-destructive/20 p-4 space-y-2">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-destructive/10 flex items-center justify-center">
+                  <span className="text-sm font-bold text-destructive">A</span>
+                </div>
+                <span className="font-display font-bold text-sm text-foreground">{t('ussdAirtel')}</span>
+              </div>
+              <button
+                onClick={() => copyCode(codes.airtel)}
+                className="w-full flex items-center justify-between bg-card rounded-lg p-3 border border-border active:scale-[0.98] transition-transform"
+              >
+                <code className="text-base font-bold text-foreground tracking-wide">{codes.airtel}</code>
+                <Copy className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+              </button>
+              <p className="text-xs text-muted-foreground">{t('copyCode')}</p>
+            </div>
+
+            {/* Payment info */}
+            <div className="bg-muted/50 rounded-lg p-3 space-y-1">
+              <p className="text-xs font-medium text-foreground">{t('ussdPayTo')}</p>
+              <p className="text-xs text-muted-foreground">{t('ussdAmount')}: <span className="font-bold text-foreground">{codes.amountRWF}</span></p>
+            </div>
+
+            {/* Steps */}
+            <div className="space-y-2">
+              <p className="text-xs text-muted-foreground">{t('ussdStep1')}</p>
+              <p className="text-xs text-muted-foreground">{t('ussdStep2')}</p>
+              <p className="text-xs text-muted-foreground">{t('ussdStep3')}</p>
+            </div>
+          </CardContent>
+        )}
+      </Card>
     </div>
   );
 };
