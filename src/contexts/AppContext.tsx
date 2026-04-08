@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
 import { AppState, Transaction, Feedback, loadState, saveState, generateId } from '@/lib/store';
 import { Language, t as translate } from '@/lib/i18n';
 
@@ -15,7 +15,7 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType | null>(null);
 
-export function AppProvider({ children }: { children: React.ReactNode }) {
+export function AppProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<AppState>(loadState);
 
   useEffect(() => { saveState(state); }, [state]);
