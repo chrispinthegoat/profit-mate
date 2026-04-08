@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useApp } from '@/contexts/AppContext';
+import { useApp } from '@/contexts/useApp';
 import { getTodayTransactions, getWeekTransactions, calcProfit, calcTotal, formatCurrency, getWeekDayTotals, getToday } from '@/lib/store';
 import { TrendingUp, TrendingDown, ShoppingBag, Receipt, ArrowUpRight, ArrowDownRight, Plus, Sparkles } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
