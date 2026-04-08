@@ -8,7 +8,7 @@ export const languageNames: Record<Language, string> = {
 
 const translations: Record<Language, Record<string, string>> = {
   en: {
-    appName: 'Profit Mate',
+    appName: 'ProfitMate',
     dashboard: 'Home',
     sales: 'Sales',
     expenses: 'Expenses',
@@ -70,7 +70,7 @@ const translations: Record<Language, Record<string, string>> = {
     premiumFeatures2: 'Multiple shops',
     premiumFeatures3: 'Advanced analytics',
     premiumFeatures4: 'Phone support',
-    welcomeTitle: 'Welcome to Profit Mate! 👋',
+    welcomeTitle: 'Welcome to ProfitMate! 👋',
     welcomeSubtitle: 'Stop guessing your profit. Start recording your sales and expenses — we do the math for you.',
     welcomeStep1: 'Tap "Record Sale" when you sell something',
     welcomeStep2: 'Tap "Record Expense" when you spend money',
@@ -88,7 +88,7 @@ const translations: Record<Language, Record<string, string>> = {
     noNotebook: 'No more notebooks. No more guessing.',
   },
   rw: {
-    appName: 'Profit Mate',
+    appName: 'ProfitMate',
     dashboard: 'Ahabanza',
     sales: 'Ibicuruzwa',
     expenses: 'Ibyakoreshejwe',
@@ -150,7 +150,7 @@ const translations: Record<Language, Record<string, string>> = {
     premiumFeatures2: 'Amaduka menshi',
     premiumFeatures3: 'Isesengura ryimbitse',
     premiumFeatures4: 'Ubufasha kuri telefoni',
-    welcomeTitle: 'Murakaza neza kuri Profit Mate! 👋',
+    welcomeTitle: 'Murakaza neza kuri ProfitMate! 👋',
     welcomeSubtitle: 'Reka gutekereza ku nyungu yawe. Tangira kwandika ibicuruzwa n\'ibyakoreshejwe — twebwe turabara.',
     welcomeStep1: 'Kanda "Andika Igicuruzwa" iyo ugurishije',
     welcomeStep2: 'Kanda "Andika Ibyakoreshejwe" iyo ukoresheje amafaranga',
@@ -168,7 +168,7 @@ const translations: Record<Language, Record<string, string>> = {
     noNotebook: 'Nta mucanga ukenewe. Nta gutekereza.',
   },
   sw: {
-    appName: 'Profit Mate',
+    appName: 'ProfitMate',
     dashboard: 'Nyumbani',
     sales: 'Mauzo',
     expenses: 'Gharama',
@@ -230,7 +230,7 @@ const translations: Record<Language, Record<string, string>> = {
     premiumFeatures2: 'Maduka mengi',
     premiumFeatures3: 'Uchambuzi wa kina',
     premiumFeatures4: 'Msaada wa simu',
-    welcomeTitle: 'Karibu Profit Mate! 👋',
+    welcomeTitle: 'Karibu ProfitMate! 👋',
     welcomeSubtitle: 'Acha kukisia faida yako. Anza kurekodi mauzo na gharama — sisi tunafanya hesabu.',
     welcomeStep1: 'Bonyeza "Rekodi Mauzo" unapouza kitu',
     welcomeStep2: 'Bonyeza "Rekodi Gharama" unapotumia pesa',
