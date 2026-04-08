@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useApp } from '@/contexts/AppContext';
+import { useApp } from '@/contexts/useApp';
 import { formatCurrency, getToday } from '@/lib/store';
 import { Plus, Trash2, Receipt } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';

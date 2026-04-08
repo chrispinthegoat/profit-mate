@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useApp } from '@/contexts/AppContext';
+import { useApp } from '@/contexts/useApp';
 import Dashboard from '@/components/Dashboard';
 import SalesPage from '@/components/SalesPage';
 import ExpensesPage from '@/components/ExpensesPage';

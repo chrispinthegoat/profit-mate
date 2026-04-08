@@ -1,24 +1,14 @@
-import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
-import { AppState, Transaction, Feedback, loadState, saveState, generateId } from '@/lib/store';
-import { Language, t as translate } from '@/lib/i18n';
-
-interface AppContextType {
-  state: AppState;
-  t: (key: string) => string;
-  addTransaction: (tx: Omit<Transaction, 'id' | 'createdAt'>) => void;
-  deleteTransaction: (id: string) => void;
-  addFeedback: (fb: Omit<Feedback, 'id' | 'createdAt'>) => void;
-  setLanguage: (lang: Language) => void;
-  setPlan: (plan: 'free' | 'basic' | 'pro') => void;
-  setCurrency: (currency: string) => void;
-}
-
-const AppContext = createContext<AppContextType | null>(null);
+import { useCallback, useEffect, useState, type ReactNode } from 'react';
+import { AppContext } from './app-context';
+import { type AppState, type Feedback, type Transaction, loadState, saveState, generateId } from '@/lib/store';
+import { type Language, t as translate } from '@/lib/i18n';
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<AppState>(loadState);
 
-  useEffect(() => { saveState(state); }, [state]);
+  useEffect(() => {
+    saveState(state);
+  }, [state]);
 
   const tFn = useCallback((key: string) => translate(key, state.language), [state.language]);
 
@@ -57,10 +47,4 @@ export function AppProvider({ children }: { children: ReactNode }) {
       {children}
     </AppContext.Provider>
   );
-}
-
-export function useApp() {
-  const ctx = useContext(AppContext);
-  if (!ctx) throw new Error('useApp must be used within AppProvider');
-  return ctx;
 }
