@@ -30,7 +30,7 @@ const AppShell = () => {
             <span className="text-primary-foreground font-display font-extrabold text-base">P</span>
           </div>
           <div>
-            <h1 className="text-lg font-display font-extrabold text-foreground leading-tight">Profit Mate</h1>
+            <h1 className="text-lg font-display font-extrabold text-foreground leading-tight">ProfitMate</h1>
             <p className="text-[10px] text-muted-foreground leading-tight">{t('yourShop')}</p>
           </div>
         </div>
