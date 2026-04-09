@@ -1,11 +1,14 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useApp } from '@/contexts/useApp';
+import { supabase } from '@/integrations/supabase/client';
 import Dashboard from '@/components/Dashboard';
 import SalesPage from '@/components/SalesPage';
 import ExpensesPage from '@/components/ExpensesPage';
 import SettingsPage from '@/components/SettingsPage';
 import FeedbackPage from '@/components/FeedbackPage';
-import { Home, ShoppingBag, Receipt, Settings, HelpCircle } from 'lucide-react';
+import { Home, ShoppingBag, Receipt, Settings, HelpCircle, User, LogOut } from 'lucide-react';
+import { toast } from 'sonner';
 
 type Tab = 'dashboard' | 'sales' | 'expenses' | 'settings' | 'feedback';
 
