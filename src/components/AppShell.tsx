@@ -14,7 +14,24 @@ type Tab = 'dashboard' | 'sales' | 'expenses' | 'settings' | 'feedback';
 
 const AppShell = () => {
   const { t } = useApp();
+  const navigate = useNavigate();
   const [tab, setTab] = useState<Tab>('dashboard');
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    toast.success('Signed out');
+  };
 
   const tabs: { key: Tab; icon: typeof Home; label: string }[] = [
     { key: 'dashboard', icon: Home, label: t('dashboard') },
