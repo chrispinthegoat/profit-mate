@@ -25,6 +25,7 @@ export interface AppState {
   language: Language;
   plan: 'free' | 'basic' | 'pro';
   currency: string;
+  notificationsEnabled: boolean | null; // null = never asked
 }
 
 const STORAGE_KEY = 'profitmate_data';
@@ -35,6 +36,7 @@ const defaultState: AppState = {
   language: 'en',
   plan: 'free',
   currency: 'RWF',
+  notificationsEnabled: null,
 };
 
 export function loadState(): AppState {
