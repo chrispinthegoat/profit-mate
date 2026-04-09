@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '@/contexts/useApp';
 import { supabase } from '@/integrations/supabase/client';
@@ -7,16 +7,21 @@ import SalesPage from '@/components/SalesPage';
 import ExpensesPage from '@/components/ExpensesPage';
 import SettingsPage from '@/components/SettingsPage';
 import FeedbackPage from '@/components/FeedbackPage';
-import { Home, ShoppingBag, Receipt, Settings, HelpCircle, User, LogOut } from 'lucide-react';
+import NotificationPanel from '@/components/NotificationPanel';
+import NotificationPrompt from '@/components/NotificationPrompt';
+import { Home, ShoppingBag, Receipt, Settings, HelpCircle, User, LogOut, Bell } from 'lucide-react';
 import { toast } from 'sonner';
 
 type Tab = 'dashboard' | 'sales' | 'expenses' | 'settings' | 'feedback';
 
 const AppShell = () => {
-  const { t } = useApp();
+  const { t, state, notifications, unreadCount, markAllRead, clearNotifications, setNotificationsEnabled } = useApp();
   const navigate = useNavigate();
   const [tab, setTab] = useState<Tab>('dashboard');
   const [user, setUser] = useState<any>(null);
+  const [showNotifPanel, setShowNotifPanel] = useState(false);
+  const [showNotifPrompt, setShowNotifPrompt] = useState(false);
+  const bellRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -27,6 +32,14 @@ const AppShell = () => {
     });
     return () => subscription.unsubscribe();
   }, []);
+
+  // Show notification prompt after a short delay if never asked
+  useEffect(() => {
+    if (state.notificationsEnabled === null) {
+      const timer = setTimeout(() => setShowNotifPrompt(true), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [state.notificationsEnabled]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -43,6 +56,21 @@ const AppShell = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col max-w-lg mx-auto">
+      {/* Notification Prompt */}
+      {showNotifPrompt && (
+        <NotificationPrompt
+          onAccept={() => {
+            setNotificationsEnabled(true);
+            setShowNotifPrompt(false);
+            toast.success(t('notifEnabled'));
+          }}
+          onDecline={() => {
+            setNotificationsEnabled(false);
+            setShowNotifPrompt(false);
+          }}
+        />
+      )}
+
       {/* Header */}
       <header className="sticky top-0 z-10 bg-card/90 backdrop-blur-lg border-b border-border px-4 py-3">
         <div className="flex items-center justify-between">
@@ -55,22 +83,46 @@ const AppShell = () => {
               <p className="text-[10px] text-muted-foreground leading-tight">{t('yourShop')}</p>
             </div>
           </div>
-          {user ? (
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-            >
-              <LogOut className="w-4 h-4" />
-            </button>
-          ) : (
-            <button
-              onClick={() => navigate('/auth')}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-primary hover:bg-primary/5 transition-colors"
-            >
-              <User className="w-4 h-4" />
-              <span>Sign In</span>
-            </button>
-          )}
+          <div className="flex items-center gap-1">
+            {/* Bell icon */}
+            <div className="relative" ref={bellRef}>
+              <button
+                onClick={() => setShowNotifPanel(!showNotifPanel)}
+                className="relative p-2 rounded-lg hover:bg-muted transition-colors"
+              >
+                <Bell className="w-5 h-5 text-muted-foreground" />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 w-4.5 h-4.5 min-w-[18px] rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center">
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
+                )}
+              </button>
+              {showNotifPanel && (
+                <NotificationPanel
+                  notifications={notifications}
+                  onMarkAllRead={markAllRead}
+                  onClear={clearNotifications}
+                  onClose={() => setShowNotifPanel(false)}
+                />
+              )}
+            </div>
+            {user ? (
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            ) : (
+              <button
+                onClick={() => navigate('/auth')}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-primary hover:bg-primary/5 transition-colors"
+              >
+                <User className="w-4 h-4" />
+                <span>Sign In</span>
+              </button>
+            )}
+          </div>
         </div>
       </header>
 
