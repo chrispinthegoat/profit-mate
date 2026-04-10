@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useApp } from '@/contexts/useApp';
 import { getTodayTransactions, getWeekTransactions, calcProfit, calcTotal, formatCurrency, getWeekDayTotals, getToday } from '@/lib/store';
-import { TrendingUp, TrendingDown, ShoppingBag, Receipt, ArrowUpRight, ArrowDownRight, Plus, Sparkles } from 'lucide-react';
+import { TrendingUp, TrendingDown, ShoppingBag, Receipt, ArrowUpRight, ArrowDownRight, Plus, Sparkles, FileDown } from 'lucide-react';
+import { exportTransactionsPdf } from '@/lib/exportPdf';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -252,6 +253,30 @@ const Dashboard = () => {
           )}
         </CardContent>
       </Card>
+
+      {/* Export PDF */}
+      {!isFirstTime && (
+        <Button
+          variant="outline"
+          className="w-full h-12 gap-2 font-display font-bold"
+          onClick={() => exportTransactionsPdf(transactions, currency, {
+            title: t('reportTitle'),
+            sales: t('sales'),
+            expenses: t('expenses'),
+            totalSales: t('totalSales'),
+            totalExpenses: t('totalExpenses'),
+            netProfit: t('netProfit'),
+            date: t('date'),
+            description: t('description'),
+            amount: t('amount'),
+            category: t('category'),
+            noData: t('noData'),
+          })}
+        >
+          <FileDown className="w-5 h-5" />
+          {t('exportPdf')}
+        </Button>
+      )}
 
       {/* Offline badge */}
       {isFirstTime && (

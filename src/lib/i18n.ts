@@ -113,6 +113,8 @@ const translations: Record<Language, Record<string, string>> = {
     notifExpenseRecorded: 'Expense recorded: {desc} — {amount}',
     notifProfitCalc: 'Your daily profit has been calculated',
     justNow: 'Just now',
+    exportPdf: 'Export PDF',
+    reportTitle: 'Transaction Report',
   },
   rw: {
     appName: 'ProfitMate',
@@ -219,6 +221,8 @@ const translations: Record<Language, Record<string, string>> = {
     notifExpenseRecorded: 'Ibyakoreshejwe byanditswe: {desc} — {amount}',
     notifProfitCalc: 'Inyungu yawe ya buri munsi yabaruwe',
     justNow: 'Ubu nyine',
+    exportPdf: 'Kohereza PDF',
+    reportTitle: 'Raporo y\'Ibikorwa',
   },
   sw: {
     appName: 'ProfitMate',
@@ -325,6 +329,8 @@ const translations: Record<Language, Record<string, string>> = {
     notifExpenseRecorded: 'Gharama imerekodiwa: {desc} — {amount}',
     notifProfitCalc: 'Faida yako ya kila siku imehesabiwa',
     justNow: 'Sasa hivi',
+    exportPdf: 'Hamisha PDF',
+    reportTitle: 'Ripoti ya Miamala',
   },
   fr: {
     appName: 'ProfitMate',
@@ -431,6 +437,8 @@ const translations: Record<Language, Record<string, string>> = {
     notifExpenseRecorded: 'Dépense enregistrée : {desc} — {amount}',
     notifProfitCalc: 'Votre profit quotidien a été calculé',
     justNow: 'À l\'instant',
+    exportPdf: 'Exporter PDF',
+    reportTitle: 'Rapport des Transactions',
   },
 };
 
