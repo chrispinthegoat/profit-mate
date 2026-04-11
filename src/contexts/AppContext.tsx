@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { AppContext } from './app-context';
-import { type AppState, type Feedback, type Transaction, loadState, saveState, generateId } from '@/lib/store';
+import { type AppState, type Feedback, type Transaction, type Theme, loadState, saveState, generateId } from '@/lib/store';
 import { type Language, t as translate } from '@/lib/i18n';
 import { type AppNotification, loadNotifications, saveNotifications } from '@/lib/notifications';
 
@@ -68,6 +68,24 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setState(prev => ({ ...prev, currency }));
   }, []);
 
+  const setTheme = useCallback((theme: Theme) => {
+    setState(prev => ({ ...prev, theme }));
+  }, []);
+
+  // Apply theme class to document
+  useEffect(() => {
+    const root = document.documentElement;
+    if (state.theme === 'dark') {
+      root.classList.add('dark');
+    } else if (state.theme === 'light') {
+      root.classList.remove('dark');
+    } else {
+      // system
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      root.classList.toggle('dark', prefersDark);
+    }
+  }, [state.theme]);
+
   const markAllRead = useCallback(() => {
     setNotifications(prev => prev.map(n => ({ ...n, read: true })));
   }, []);
@@ -84,7 +102,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   return (
     <AppContext.Provider value={{
-      state, t: tFn, addTransaction, deleteTransaction, addFeedback, setLanguage, setPlan, setCurrency,
+      state, t: tFn, addTransaction, deleteTransaction, addFeedback, setLanguage, setPlan, setCurrency, setTheme,
       notifications, unreadCount, addNotification, markAllRead, clearNotifications, setNotificationsEnabled,
     }}>
       {children}

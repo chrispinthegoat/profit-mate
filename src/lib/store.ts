@@ -19,6 +19,8 @@ export interface Feedback {
   createdAt: string;
 }
 
+export type Theme = 'light' | 'dark' | 'system';
+
 export interface AppState {
   transactions: Transaction[];
   feedbacks: Feedback[];
@@ -26,6 +28,7 @@ export interface AppState {
   plan: 'free' | 'basic' | 'pro';
   currency: string;
   notificationsEnabled: boolean | null; // null = never asked
+  theme: Theme;
 }
 
 const STORAGE_KEY = 'profitmate_data';
@@ -37,6 +40,7 @@ const defaultState: AppState = {
   plan: 'free',
   currency: 'RWF',
   notificationsEnabled: null,
+  theme: 'light',
 };
 
 export function loadState(): AppState {

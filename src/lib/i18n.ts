@@ -115,6 +115,10 @@ const translations: Record<Language, Record<string, string>> = {
     justNow: 'Just now',
     exportPdf: 'Export PDF',
     reportTitle: 'Transaction Report',
+    appearance: 'Appearance',
+    lightMode: 'Light',
+    darkMode: 'Dark',
+    systemMode: 'System',
   },
   rw: {
     appName: 'ProfitMate',
@@ -223,6 +227,10 @@ const translations: Record<Language, Record<string, string>> = {
     justNow: 'Ubu nyine',
     exportPdf: 'Kohereza PDF',
     reportTitle: 'Raporo y\'Ibikorwa',
+    appearance: 'Isura',
+    lightMode: 'Urumuri',
+    darkMode: 'Umwijima',
+    systemMode: 'Sisitemu',
   },
   sw: {
     appName: 'ProfitMate',
@@ -331,6 +339,10 @@ const translations: Record<Language, Record<string, string>> = {
     justNow: 'Sasa hivi',
     exportPdf: 'Hamisha PDF',
     reportTitle: 'Ripoti ya Miamala',
+    appearance: 'Muonekano',
+    lightMode: 'Mwanga',
+    darkMode: 'Giza',
+    systemMode: 'Mfumo',
   },
   fr: {
     appName: 'ProfitMate',
@@ -439,6 +451,10 @@ const translations: Record<Language, Record<string, string>> = {
     justNow: 'À l\'instant',
     exportPdf: 'Exporter PDF',
     reportTitle: 'Rapport des Transactions',
+    appearance: 'Apparence',
+    lightMode: 'Clair',
+    darkMode: 'Sombre',
+    systemMode: 'Système',
   },
 };
 
