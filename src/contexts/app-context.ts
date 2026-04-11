@@ -1,6 +1,6 @@
 import { createContext } from 'react';
 import type { Language } from '@/lib/i18n';
-import type { AppState, Feedback, Transaction } from '@/lib/store';
+import type { AppState, Feedback, Transaction, Theme } from '@/lib/store';
 import type { AppNotification } from '@/lib/notifications';
 
 export interface AppContextType {
@@ -12,6 +12,7 @@ export interface AppContextType {
   setLanguage: (lang: Language) => void;
   setPlan: (plan: 'free' | 'basic' | 'pro') => void;
   setCurrency: (currency: string) => void;
+  setTheme: (theme: Theme) => void;
   notifications: AppNotification[];
   unreadCount: number;
   addNotification: (type: AppNotification['type'], message: string) => void;
