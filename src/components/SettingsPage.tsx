@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { useApp } from '@/contexts/useApp';
 import { Language, languageNames } from '@/lib/i18n';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Check, Crown, Sparkles, Phone, Copy, ChevronDown, ChevronUp } from 'lucide-react';
+import { Check, Crown, Sparkles, Phone, Copy, ChevronDown, ChevronUp, Sun, Moon, Monitor } from 'lucide-react';
+import { Theme } from '@/lib/store';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 
@@ -38,7 +39,7 @@ const ussdCodes = {
 };
 
 const SettingsPage = () => {
-  const { state, t, setLanguage, setPlan, setCurrency } = useApp();
+  const { state, t, setLanguage, setPlan, setCurrency, setTheme } = useApp();
   const [showUssd, setShowUssd] = useState(false);
   const [selectedPlanForUssd, setSelectedPlanForUssd] = useState<'basic' | 'pro'>('basic');
 
@@ -55,8 +56,38 @@ const SettingsPage = () => {
 
   const codes = ussdCodes[selectedPlanForUssd];
 
+  const themeOptions: { key: Theme; icon: typeof Sun; label: string }[] = [
+    { key: 'light', icon: Sun, label: t('lightMode') },
+    { key: 'dark', icon: Moon, label: t('darkMode') },
+    { key: 'system', icon: Monitor, label: t('systemMode') },
+  ];
+
   return (
     <div className="space-y-6 animate-fade-in">
+      {/* Appearance */}
+      <Card className="border border-border shadow-sm">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base font-display">{t('appearance')}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-3 gap-2">
+            {themeOptions.map(({ key, icon: Icon, label }) => (
+              <button
+                key={key}
+                onClick={() => setTheme(key)}
+                className={`flex flex-col items-center gap-1.5 p-3 rounded-lg text-sm font-medium transition-all ${
+                  state.theme === key
+                    ? 'gradient-primary text-primary-foreground shadow-md'
+                    : 'bg-muted text-foreground hover:bg-muted/80'
+                }`}
+              >
+                <Icon className="w-5 h-5" />
+                {label}
+              </button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
       {/* Language */}
       <Card className="border border-border shadow-sm">
         <CardHeader className="pb-2">
