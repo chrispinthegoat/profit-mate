@@ -9,7 +9,7 @@ import SettingsPage from '@/components/SettingsPage';
 import FeedbackPage from '@/components/FeedbackPage';
 import NotificationPanel from '@/components/NotificationPanel';
 import NotificationPrompt from '@/components/NotificationPrompt';
-import { Home, ShoppingBag, Receipt, Settings, HelpCircle, User, LogOut, Bell } from 'lucide-react';
+import { Home, ShoppingBag, Receipt, Settings, HelpCircle, User, LogOut, Bell, Sun, Moon } from 'lucide-react';
 import { toast } from 'sonner';
 
 type Tab = 'dashboard' | 'sales' | 'expenses' | 'settings' | 'feedback';
@@ -84,6 +84,19 @@ const AppShell = () => {
             </div>
           </div>
           <div className="flex items-center gap-1">
+            {/* Theme toggle */}
+            <button
+              onClick={() => {
+                const isDark = document.documentElement.classList.contains('dark');
+                document.documentElement.classList.toggle('dark', !isDark);
+                try { localStorage.setItem('profitmate_data', JSON.stringify({ ...JSON.parse(localStorage.getItem('profitmate_data') || '{}'), theme: isDark ? 'light' : 'dark' })); } catch {}
+              }}
+              className="p-2 rounded-lg hover:bg-muted transition-colors"
+              aria-label="Toggle theme"
+            >
+              <Sun className="w-5 h-5 text-muted-foreground hidden dark:block" />
+              <Moon className="w-5 h-5 text-muted-foreground block dark:hidden" />
+            </button>
             {/* Bell icon */}
             <div className="relative" ref={bellRef}>
               <button
