@@ -9,7 +9,7 @@ import SettingsPage from '@/components/SettingsPage';
 import FeedbackPage from '@/components/FeedbackPage';
 import NotificationPanel from '@/components/NotificationPanel';
 import NotificationPrompt from '@/components/NotificationPrompt';
-import { Home, ShoppingBag, Receipt, Settings, HelpCircle, User, LogOut, Bell } from 'lucide-react';
+import { Home, ShoppingBag, Receipt, Settings, HelpCircle, User, LogOut, Bell, Sun, Moon } from 'lucide-react';
 import { toast } from 'sonner';
 
 type Tab = 'dashboard' | 'sales' | 'expenses' | 'settings' | 'feedback';
