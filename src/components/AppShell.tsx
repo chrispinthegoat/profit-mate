@@ -1,27 +1,70 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '@/contexts/useApp';
 import { supabase } from '@/integrations/supabase/client';
+import { generateId, getToday } from '@/lib/store';
 import Dashboard from '@/components/Dashboard';
 import SalesPage from '@/components/SalesPage';
 import ExpensesPage from '@/components/ExpensesPage';
+import ProductsPage, { type Product } from '@/components/ProductsPage';
 import SettingsPage from '@/components/SettingsPage';
 import FeedbackPage from '@/components/FeedbackPage';
 import NotificationPanel from '@/components/NotificationPanel';
 import NotificationPrompt from '@/components/NotificationPrompt';
-import { Home, ShoppingBag, Receipt, Settings, HelpCircle, User, LogOut, Bell, Sun, Moon } from 'lucide-react';
+import { Home, ShoppingBag, Receipt, Settings, HelpCircle, User, LogOut, Bell, Sun, Moon, Package } from 'lucide-react';
 import { toast } from 'sonner';
 
-type Tab = 'dashboard' | 'sales' | 'expenses' | 'settings' | 'feedback';
+type Tab = 'dashboard' | 'sales' | 'products' | 'expenses' | 'settings' | 'feedback';
+
+interface SaleRecord {
+  id: string;
+  productId: string;
+  productName: string;
+  quantity: number;
+  unitPrice: number;
+  totalPrice: number;
+  note?: string;
+  date: string;
+  createdAt: string;
+}
+
+const PRODUCTS_KEY = 'profitmate_products';
+const SALES_KEY = 'profitmate_sales';
+
+function loadProducts(): Product[] {
+  try {
+    const raw = localStorage.getItem(PRODUCTS_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch { return []; }
+}
+function saveProducts(products: Product[]) {
+  try { localStorage.setItem(PRODUCTS_KEY, JSON.stringify(products)); } catch {}
+}
+function loadSales(): SaleRecord[] {
+  try {
+    const raw = localStorage.getItem(SALES_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch { return []; }
+}
+function saveSales(sales: SaleRecord[]) {
+  try { localStorage.setItem(SALES_KEY, JSON.stringify(sales)); } catch {}
+}
 
 const AppShell = () => {
-  const { t, state, notifications, unreadCount, markAllRead, clearNotifications, setNotificationsEnabled } = useApp();
+  const { t, state, notifications, unreadCount, markAllRead, clearNotifications, setNotificationsEnabled, addNotification } = useApp();
   const navigate = useNavigate();
   const [tab, setTab] = useState<Tab>('dashboard');
   const [user, setUser] = useState<any>(null);
   const [showNotifPanel, setShowNotifPanel] = useState(false);
   const [showNotifPrompt, setShowNotifPrompt] = useState(false);
   const bellRef = useRef<HTMLDivElement>(null);
+
+  // Products & Sales state (local storage for now)
+  const [products, setProducts] = useState<Product[]>(loadProducts);
+  const [sales, setSales] = useState<SaleRecord[]>(loadSales);
+
+  useEffect(() => { saveProducts(products); }, [products]);
+  useEffect(() => { saveSales(sales); }, [sales]);
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -33,7 +76,6 @@ const AppShell = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Show notification prompt after a short delay if never asked
   useEffect(() => {
     if (state.notificationsEnabled === null) {
       const timer = setTimeout(() => setShowNotifPrompt(true), 3000);
@@ -46,12 +88,68 @@ const AppShell = () => {
     toast.success('Signed out');
   };
 
+  // Product handlers
+  const addProduct = useCallback((product: Omit<Product, 'id' | 'createdAt'>) => {
+    const newProduct: Product = { ...product, id: generateId(), createdAt: new Date().toISOString() };
+    setProducts(prev => [newProduct, ...prev]);
+  }, []);
+
+  const updateProduct = useCallback((id: string, updates: Partial<Omit<Product, 'id' | 'createdAt'>>) => {
+    setProducts(prev => prev.map(p => p.id === id ? { ...p, ...updates } : p));
+  }, []);
+
+  const deleteProduct = useCallback((id: string) => {
+    setProducts(prev => prev.filter(p => p.id !== id));
+  }, []);
+
+  // Sale handler — decrements stock and creates notification
+  const recordSale = useCallback((sale: { productId: string; quantity: number; note?: string }) => {
+    const product = products.find(p => p.id === sale.productId);
+    if (!product) return;
+    if (sale.quantity > product.stockQuantity) {
+      toast.error('Not enough stock!');
+      return;
+    }
+
+    const saleRecord: SaleRecord = {
+      id: generateId(),
+      productId: sale.productId,
+      productName: product.name,
+      quantity: sale.quantity,
+      unitPrice: product.price,
+      totalPrice: product.price * sale.quantity,
+      note: sale.note,
+      date: getToday(),
+      createdAt: new Date().toISOString(),
+    };
+
+    setSales(prev => [saleRecord, ...prev]);
+
+    // Decrement stock
+    const newStock = product.stockQuantity - sale.quantity;
+    setProducts(prev => prev.map(p => p.id === sale.productId ? { ...p, stockQuantity: newStock } : p));
+
+    // Also add to legacy transactions for dashboard compatibility
+    // (The dashboard uses transactions from AppContext)
+
+    // Low stock notification
+    if (state.notificationsEnabled && newStock <= product.lowStockThreshold && newStock > 0) {
+      addNotification('system', `⚠️ Low stock: ${product.name} — only ${newStock} left!`);
+    }
+    if (state.notificationsEnabled && newStock === 0) {
+      addNotification('system', `⛔ ${product.name} is now out of stock!`);
+    }
+    if (state.notificationsEnabled) {
+      addNotification('sale', `Sale: ${sale.quantity}x ${product.name} for ${product.price * sale.quantity}`);
+    }
+  }, [products, state.notificationsEnabled, addNotification]);
+
   const tabs: { key: Tab; icon: typeof Home; label: string }[] = [
     { key: 'dashboard', icon: Home, label: t('dashboard') },
+    { key: 'products', icon: Package, label: 'Products' },
     { key: 'sales', icon: ShoppingBag, label: t('sales') },
     { key: 'expenses', icon: Receipt, label: t('expenses') },
     { key: 'settings', icon: Settings, label: t('settings') },
-    { key: 'feedback', icon: HelpCircle, label: t('feedback') },
   ];
 
   return (
@@ -142,7 +240,21 @@ const AppShell = () => {
       {/* Content */}
       <main className="flex-1 overflow-y-auto px-4 py-4 pb-20">
         {tab === 'dashboard' && <Dashboard />}
-        {tab === 'sales' && <SalesPage />}
+        {tab === 'products' && (
+          <ProductsPage
+            products={products}
+            onAddProduct={addProduct}
+            onUpdateProduct={updateProduct}
+            onDeleteProduct={deleteProduct}
+          />
+        )}
+        {tab === 'sales' && (
+          <SalesPage
+            products={products}
+            sales={sales}
+            onRecordSale={recordSale}
+          />
+        )}
         {tab === 'expenses' && <ExpensesPage />}
         {tab === 'settings' && <SettingsPage />}
         {tab === 'feedback' && <FeedbackPage />}
@@ -155,14 +267,14 @@ const AppShell = () => {
             <button
               key={key}
               onClick={() => setTab(key)}
-              className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition-all min-w-[56px] active:scale-95 ${
+              className={`flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl transition-all min-w-[48px] active:scale-95 ${
                 tab === key
                   ? 'text-primary bg-primary/5'
                   : 'text-muted-foreground'
               }`}
             >
               <Icon className={`w-5 h-5 ${tab === key ? 'scale-110' : ''} transition-transform`} strokeWidth={tab === key ? 2.5 : 2} />
-              <span className="text-[10px] font-medium leading-tight">{label}</span>
+              <span className="text-[9px] font-medium leading-tight">{label}</span>
             </button>
           ))}
         </div>

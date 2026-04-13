@@ -1,6 +1,6 @@
 export interface AppNotification {
   id: string;
-  type: 'sale' | 'expense' | 'profit' | 'update';
+  type: 'sale' | 'expense' | 'profit' | 'update' | 'system';
   message: string;
   timestamp: string;
   read: boolean;
