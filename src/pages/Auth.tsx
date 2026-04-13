@@ -45,7 +45,20 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center px-4">
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center px-4 relative">
+      {/* Theme toggle */}
+      <button
+        onClick={() => {
+          const isDark = document.documentElement.classList.contains('dark');
+          document.documentElement.classList.toggle('dark', !isDark);
+          try { localStorage.setItem('profitmate_data', JSON.stringify({ ...JSON.parse(localStorage.getItem('profitmate_data') || '{}'), theme: isDark ? 'light' : 'dark' })); } catch {}
+        }}
+        className="absolute top-4 right-4 p-2 rounded-full bg-muted hover:bg-muted/80 text-foreground transition-colors"
+        aria-label="Toggle theme"
+      >
+        <Sun className="w-5 h-5 hidden dark:block" />
+        <Moon className="w-5 h-5 block dark:hidden" />
+      </button>
       <div className="w-full max-w-sm space-y-6">
         {/* Logo */}
         <div className="flex flex-col items-center gap-2">
