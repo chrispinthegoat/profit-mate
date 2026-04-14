@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { toast } from 'sonner';
+import MonthlyChart from '@/components/MonthlyChart';
 
 const Dashboard = () => {
   const { state, t, addTransaction } = useApp();
@@ -253,6 +254,9 @@ const Dashboard = () => {
           )}
         </CardContent>
       </Card>
+
+      {/* Monthly Comparison & Yearly Report */}
+      {!isFirstTime && <MonthlyChart />}
 
       {/* Export PDF */}
       {!isFirstTime && (
