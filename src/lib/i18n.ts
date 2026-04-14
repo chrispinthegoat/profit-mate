@@ -457,6 +457,8 @@ const translations: Record<Language, Record<string, string>> = {
     justNow: 'À l\'instant',
     exportPdf: 'Exporter PDF',
     reportTitle: 'Rapport des Transactions',
+    yearlyReport: 'Rapport Annuel',
+    monthlyComparison: 'Comparaison Mensuelle',
     appearance: 'Apparence',
     lightMode: 'Clair',
     darkMode: 'Sombre',
