@@ -195,6 +195,15 @@ const AppShell = () => {
               <Sun className="w-5 h-5 text-muted-foreground hidden dark:block" />
               <Moon className="w-5 h-5 text-muted-foreground block dark:hidden" />
             </button>
+            {/* Help / Feedback */}
+            <button
+              onClick={() => setTab('feedback')}
+              className="p-2 rounded-lg hover:bg-muted transition-colors"
+              aria-label={t('feedback')}
+              title={t('feedback')}
+            >
+              <HelpCircle className={`w-5 h-5 ${tab === 'feedback' ? 'text-primary' : 'text-muted-foreground'}`} />
+            </button>
             {/* Bell icon */}
             <div className="relative" ref={bellRef}>
               <button
