@@ -228,15 +228,6 @@ const Auth = () => {
               </button>
             </div>
 
-            {/* Skip / Continue without account */}
-            <div className="mt-3 text-center">
-              <a
-                href="/"
-                className="text-xs text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Continue without an account →
-              </a>
-            </div>
           </CardContent>
         </Card>
       </div>

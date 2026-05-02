@@ -7,24 +7,29 @@ import { Theme } from '@/lib/store';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 
+type BillingCycle = 'monthly' | 'yearly';
+
 const plans = [
   {
     key: 'free' as const,
-    price: '$0',
+    monthly: 0,
+    yearly: 0,
     features: ['basicFeatures', 'basicFeatures2', 'basicFeatures3'],
     icon: Sparkles,
     popular: false,
   },
   {
     key: 'basic' as const,
-    price: '$2',
+    monthly: 2,
+    yearly: 20,
     features: ['proFeatures', 'proFeatures2', 'proFeatures3', 'proFeatures4'],
     icon: Crown,
     popular: true,
   },
   {
     key: 'pro' as const,
-    price: '$5',
+    monthly: 5,
+    yearly: 50,
     features: ['premiumFeatures', 'premiumFeatures2', 'premiumFeatures3', 'premiumFeatures4'],
     icon: Crown,
     popular: false,
@@ -34,14 +39,21 @@ const plans = [
 const currencies = ['RWF', 'KES', 'UGX', 'TZS', 'BIF', 'USD'];
 
 const ussdCodes = {
-  basic: { mtn: '*182*8*1*PROFITMATE*2000#', airtel: '*185*9*1*PROFITMATE*2000#', amountRWF: '2,000 RWF' },
-  pro: { mtn: '*182*8*1*PROFITMATE*5000#', airtel: '*185*9*1*PROFITMATE*5000#', amountRWF: '5,000 RWF' },
+  basic: {
+    monthly: { mtn: '*182*8*1*PROFITMATE*2000#', airtel: '*185*9*1*PROFITMATE*2000#', amountRWF: '2,000 RWF' },
+    yearly: { mtn: '*182*8*1*PROFITMATE*20000#', airtel: '*185*9*1*PROFITMATE*20000#', amountRWF: '20,000 RWF' },
+  },
+  pro: {
+    monthly: { mtn: '*182*8*1*PROFITMATE*5000#', airtel: '*185*9*1*PROFITMATE*5000#', amountRWF: '5,000 RWF' },
+    yearly: { mtn: '*182*8*1*PROFITMATE*50000#', airtel: '*185*9*1*PROFITMATE*50000#', amountRWF: '50,000 RWF' },
+  },
 };
 
 const SettingsPage = () => {
   const { state, t, setLanguage, setPlan, setCurrency, setTheme } = useApp();
   const [showUssd, setShowUssd] = useState(false);
   const [selectedPlanForUssd, setSelectedPlanForUssd] = useState<'basic' | 'pro'>('basic');
+  const [billing, setBilling] = useState<BillingCycle>('monthly');
 
   const copyCode = (code: string) => {
     navigator.clipboard.writeText(code).catch(() => {});
@@ -54,7 +66,7 @@ const SettingsPage = () => {
     setPlan(planKey);
   };
 
-  const codes = ussdCodes[selectedPlanForUssd];
+  const codes = ussdCodes[selectedPlanForUssd][billing];
 
   const themeOptions: { key: Theme; icon: typeof Sun; label: string }[] = [
     { key: 'light', icon: Sun, label: t('lightMode') },
@@ -138,12 +150,37 @@ const SettingsPage = () => {
 
       {/* Subscription Plans */}
       <div>
-        <h2 className="text-xl font-display font-bold text-foreground mb-4">{t('subscription')}</h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-display font-bold text-foreground">{t('subscription')}</h2>
+          {/* Billing cycle toggle */}
+          <div className="inline-flex rounded-lg bg-muted p-1">
+            <button
+              onClick={() => setBilling('monthly')}
+              className={`px-3 py-1 rounded-md text-xs font-bold transition-all ${
+                billing === 'monthly' ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground'
+              }`}
+            >
+              Monthly
+            </button>
+            <button
+              onClick={() => setBilling('yearly')}
+              className={`px-3 py-1 rounded-md text-xs font-bold transition-all flex items-center gap-1 ${
+                billing === 'yearly' ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground'
+              }`}
+            >
+              Yearly
+              <span className="text-[9px] px-1.5 py-0.5 rounded-full gradient-secondary text-secondary-foreground">Save</span>
+            </button>
+          </div>
+        </div>
         <div className="space-y-3">
           {plans.map(plan => {
             const Icon = plan.icon;
             const isActive = state.plan === plan.key;
             const planName = plan.key === 'free' ? t('freePlan') : plan.key === 'basic' ? t('basicPlan') : t('proPlan');
+            const amount = billing === 'monthly' ? plan.monthly : plan.yearly;
+            const priceLabel = `$${amount}`;
+            const cycleLabel = plan.key === 'free' ? '' : billing === 'monthly' ? '/month' : '/year';
             return (
               <Card
                 key={plan.key}
@@ -163,8 +200,13 @@ const SettingsPage = () => {
                       <span className="font-display font-bold text-foreground">{planName}</span>
                     </div>
                     <div className="text-right">
-                      <span className="text-xl font-display font-bold text-foreground">{plan.price}</span>
-                      <span className="text-xs text-muted-foreground">{t('perMonth')}</span>
+                      <span className="text-xl font-display font-bold text-foreground">{priceLabel}</span>
+                      <span className="text-xs text-muted-foreground">{cycleLabel}</span>
+                      {plan.key !== 'free' && billing === 'yearly' && (
+                        <p className="text-[10px] text-profit font-bold leading-tight">
+                          Save ${plan.monthly * 12 - plan.yearly}/yr
+                        </p>
+                      )}
                     </div>
                   </div>
                   <ul className="space-y-1.5 mb-3">
@@ -195,7 +237,7 @@ const SettingsPage = () => {
                         disabled={isActive}
                         onClick={() => handleUpgradeWithUssd(plan.key as 'basic' | 'pro')}
                       >
-                        {isActive ? t('currentPlan') : t('upgrade')}
+                        {isActive ? t('currentPlan') : `${t('upgrade')} — ${priceLabel}${cycleLabel}`}
                       </Button>
                       {!isActive && (
                         <Button
@@ -248,7 +290,7 @@ const SettingsPage = () => {
                     : 'bg-muted text-foreground'
                 }`}
               >
-                {t('basicPlan')} — $2
+                {t('basicPlan')} — ${billing === 'monthly' ? 2 : 20}{billing === 'monthly' ? '/mo' : '/yr'}
               </button>
               <button
                 onClick={() => setSelectedPlanForUssd('pro')}
@@ -258,7 +300,7 @@ const SettingsPage = () => {
                     : 'bg-muted text-foreground'
                 }`}
               >
-                {t('proPlan')} — $5
+                {t('proPlan')} — ${billing === 'monthly' ? 5 : 50}{billing === 'monthly' ? '/mo' : '/yr'}
               </button>
             </div>
 
