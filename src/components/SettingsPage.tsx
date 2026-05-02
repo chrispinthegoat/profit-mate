@@ -150,12 +150,37 @@ const SettingsPage = () => {
 
       {/* Subscription Plans */}
       <div>
-        <h2 className="text-xl font-display font-bold text-foreground mb-4">{t('subscription')}</h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-display font-bold text-foreground">{t('subscription')}</h2>
+          {/* Billing cycle toggle */}
+          <div className="inline-flex rounded-lg bg-muted p-1">
+            <button
+              onClick={() => setBilling('monthly')}
+              className={`px-3 py-1 rounded-md text-xs font-bold transition-all ${
+                billing === 'monthly' ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground'
+              }`}
+            >
+              Monthly
+            </button>
+            <button
+              onClick={() => setBilling('yearly')}
+              className={`px-3 py-1 rounded-md text-xs font-bold transition-all flex items-center gap-1 ${
+                billing === 'yearly' ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground'
+              }`}
+            >
+              Yearly
+              <span className="text-[9px] px-1.5 py-0.5 rounded-full gradient-secondary text-secondary-foreground">Save</span>
+            </button>
+          </div>
+        </div>
         <div className="space-y-3">
           {plans.map(plan => {
             const Icon = plan.icon;
             const isActive = state.plan === plan.key;
             const planName = plan.key === 'free' ? t('freePlan') : plan.key === 'basic' ? t('basicPlan') : t('proPlan');
+            const amount = billing === 'monthly' ? plan.monthly : plan.yearly;
+            const priceLabel = `$${amount}`;
+            const cycleLabel = plan.key === 'free' ? '' : billing === 'monthly' ? '/month' : '/year';
             return (
               <Card
                 key={plan.key}
@@ -175,8 +200,13 @@ const SettingsPage = () => {
                       <span className="font-display font-bold text-foreground">{planName}</span>
                     </div>
                     <div className="text-right">
-                      <span className="text-xl font-display font-bold text-foreground">{plan.price}</span>
-                      <span className="text-xs text-muted-foreground">{t('perMonth')}</span>
+                      <span className="text-xl font-display font-bold text-foreground">{priceLabel}</span>
+                      <span className="text-xs text-muted-foreground">{cycleLabel}</span>
+                      {plan.key !== 'free' && billing === 'yearly' && (
+                        <p className="text-[10px] text-profit font-bold leading-tight">
+                          Save ${plan.monthly * 12 - plan.yearly}/yr
+                        </p>
+                      )}
                     </div>
                   </div>
                   <ul className="space-y-1.5 mb-3">
@@ -207,7 +237,7 @@ const SettingsPage = () => {
                         disabled={isActive}
                         onClick={() => handleUpgradeWithUssd(plan.key as 'basic' | 'pro')}
                       >
-                        {isActive ? t('currentPlan') : t('upgrade')}
+                        {isActive ? t('currentPlan') : `${t('upgrade')} — ${priceLabel}${cycleLabel}`}
                       </Button>
                       {!isActive && (
                         <Button
@@ -260,7 +290,7 @@ const SettingsPage = () => {
                     : 'bg-muted text-foreground'
                 }`}
               >
-                {t('basicPlan')} — $2
+                {t('basicPlan')} — ${billing === 'monthly' ? 2 : 20}{billing === 'monthly' ? '/mo' : '/yr'}
               </button>
               <button
                 onClick={() => setSelectedPlanForUssd('pro')}
@@ -270,7 +300,7 @@ const SettingsPage = () => {
                     : 'bg-muted text-foreground'
                 }`}
               >
-                {t('proPlan')} — $5
+                {t('proPlan')} — ${billing === 'monthly' ? 5 : 50}{billing === 'monthly' ? '/mo' : '/yr'}
               </button>
             </div>
 
