@@ -145,10 +145,7 @@ const AppShell = () => {
     if (state.notificationsEnabled && newStock === 0) {
       addNotification('system', `⛔ ${product.name} is now out of stock!`);
     }
-    if (state.notificationsEnabled) {
-      addNotification('sale', `Sale: ${sale.quantity}x ${product.name} for ${product.price * sale.quantity}`);
-    }
-  }, [products, state.notificationsEnabled, addNotification]);
+  }, [products, state.notificationsEnabled, addNotification, addTransaction]);
 
   const tabs: { key: Tab; icon: typeof Home; label: string }[] = [
     { key: 'dashboard', icon: Home, label: t('dashboard') },
