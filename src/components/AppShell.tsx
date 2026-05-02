@@ -51,7 +51,7 @@ function saveSales(sales: SaleRecord[]) {
 }
 
 const AppShell = () => {
-  const { t, state, notifications, unreadCount, markAllRead, clearNotifications, setNotificationsEnabled, addNotification } = useApp();
+  const { t, state, notifications, unreadCount, markAllRead, clearNotifications, setNotificationsEnabled, addNotification, addTransaction } = useApp();
   const navigate = useNavigate();
   const [tab, setTab] = useState<Tab>('dashboard');
   const [user, setUser] = useState<any>(null);
@@ -129,8 +129,14 @@ const AppShell = () => {
     const newStock = product.stockQuantity - sale.quantity;
     setProducts(prev => prev.map(p => p.id === sale.productId ? { ...p, stockQuantity: newStock } : p));
 
-    // Also add to legacy transactions for dashboard compatibility
-    // (The dashboard uses transactions from AppContext)
+    // Mirror sale into transactions so the Dashboard (home) reflects it immediately
+    addTransaction({
+      type: 'sale',
+      amount: saleRecord.totalPrice,
+      description: `${sale.quantity}x ${product.name}${sale.note ? ` — ${sale.note}` : ''}`,
+      category: 'sale',
+      date: saleRecord.date,
+    });
 
     // Low stock notification
     if (state.notificationsEnabled && newStock <= product.lowStockThreshold && newStock > 0) {
@@ -139,10 +145,7 @@ const AppShell = () => {
     if (state.notificationsEnabled && newStock === 0) {
       addNotification('system', `⛔ ${product.name} is now out of stock!`);
     }
-    if (state.notificationsEnabled) {
-      addNotification('sale', `Sale: ${sale.quantity}x ${product.name} for ${product.price * sale.quantity}`);
-    }
-  }, [products, state.notificationsEnabled, addNotification]);
+  }, [products, state.notificationsEnabled, addNotification, addTransaction]);
 
   const tabs: { key: Tab; icon: typeof Home; label: string }[] = [
     { key: 'dashboard', icon: Home, label: t('dashboard') },
