@@ -7,24 +7,29 @@ import { Theme } from '@/lib/store';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 
+type BillingCycle = 'monthly' | 'yearly';
+
 const plans = [
   {
     key: 'free' as const,
-    price: '$0',
+    monthly: 0,
+    yearly: 0,
     features: ['basicFeatures', 'basicFeatures2', 'basicFeatures3'],
     icon: Sparkles,
     popular: false,
   },
   {
     key: 'basic' as const,
-    price: '$2',
+    monthly: 2,
+    yearly: 20,
     features: ['proFeatures', 'proFeatures2', 'proFeatures3', 'proFeatures4'],
     icon: Crown,
     popular: true,
   },
   {
     key: 'pro' as const,
-    price: '$5',
+    monthly: 5,
+    yearly: 50,
     features: ['premiumFeatures', 'premiumFeatures2', 'premiumFeatures3', 'premiumFeatures4'],
     icon: Crown,
     popular: false,
@@ -34,14 +39,21 @@ const plans = [
 const currencies = ['RWF', 'KES', 'UGX', 'TZS', 'BIF', 'USD'];
 
 const ussdCodes = {
-  basic: { mtn: '*182*8*1*PROFITMATE*2000#', airtel: '*185*9*1*PROFITMATE*2000#', amountRWF: '2,000 RWF' },
-  pro: { mtn: '*182*8*1*PROFITMATE*5000#', airtel: '*185*9*1*PROFITMATE*5000#', amountRWF: '5,000 RWF' },
+  basic: {
+    monthly: { mtn: '*182*8*1*PROFITMATE*2000#', airtel: '*185*9*1*PROFITMATE*2000#', amountRWF: '2,000 RWF' },
+    yearly: { mtn: '*182*8*1*PROFITMATE*20000#', airtel: '*185*9*1*PROFITMATE*20000#', amountRWF: '20,000 RWF' },
+  },
+  pro: {
+    monthly: { mtn: '*182*8*1*PROFITMATE*5000#', airtel: '*185*9*1*PROFITMATE*5000#', amountRWF: '5,000 RWF' },
+    yearly: { mtn: '*182*8*1*PROFITMATE*50000#', airtel: '*185*9*1*PROFITMATE*50000#', amountRWF: '50,000 RWF' },
+  },
 };
 
 const SettingsPage = () => {
   const { state, t, setLanguage, setPlan, setCurrency, setTheme } = useApp();
   const [showUssd, setShowUssd] = useState(false);
   const [selectedPlanForUssd, setSelectedPlanForUssd] = useState<'basic' | 'pro'>('basic');
+  const [billing, setBilling] = useState<BillingCycle>('monthly');
 
   const copyCode = (code: string) => {
     navigator.clipboard.writeText(code).catch(() => {});
@@ -54,7 +66,7 @@ const SettingsPage = () => {
     setPlan(planKey);
   };
 
-  const codes = ussdCodes[selectedPlanForUssd];
+  const codes = ussdCodes[selectedPlanForUssd][billing];
 
   const themeOptions: { key: Theme; icon: typeof Sun; label: string }[] = [
     { key: 'light', icon: Sun, label: t('lightMode') },
