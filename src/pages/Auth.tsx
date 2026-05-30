@@ -223,6 +223,7 @@ const Auth = () => {
                 variant="outline"
                 className="w-full"
                 onClick={async () => {
+                  if (!guardPrivacy()) return;
                   setLoading(true);
                   try {
                     const result = await lovable.auth.signInWithOAuth("apple", {
