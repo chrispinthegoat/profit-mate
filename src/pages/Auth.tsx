@@ -26,21 +26,45 @@ const Auth = () => {
     try { return localStorage.getItem(PRIVACY_KEY) !== 'true'; } catch { return true; }
   });
   const [privacyReadonly, setPrivacyReadonly] = useState(false);
+  const [pendingAction, setPendingAction] = useState<null | (() => void | Promise<void>)>(null);
 
   const acceptPrivacy = () => {
     try { localStorage.setItem(PRIVACY_KEY, 'true'); } catch {}
     setPrivacyAccepted(true);
     setShowPrivacy(false);
+    if (pendingAction) {
+      const run = pendingAction;
+      setPendingAction(null);
+      Promise.resolve(run()).catch(() => {});
+    }
   };
 
-  const guardPrivacy = () => {
+  const guardPrivacy = (queued?: () => void | Promise<void>) => {
     if (!privacyAccepted) {
       setPrivacyReadonly(false);
+      if (queued) setPendingAction(() => queued);
       setShowPrivacy(true);
       toast.error('Please accept the Privacy Policy to continue');
       return false;
     }
     return true;
+  };
+
+  const signInWithProvider = async (provider: 'google' | 'apple') => {
+    setLoading(true);
+    try {
+      const result = await lovable.auth.signInWithOAuth(provider, {
+        redirect_uri: window.location.origin,
+      });
+      if (result.error) {
+        toast.error(result.error.message || `${provider} sign-in failed`);
+      }
+      if (result.redirected) return;
+    } catch (err: any) {
+      toast.error(err.message || `${provider} sign-in failed`);
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Redirect to dashboard when user signs in
@@ -190,22 +214,9 @@ const Auth = () => {
                 type="button"
                 variant="outline"
                 className="w-full"
-                onClick={async () => {
-                  if (!guardPrivacy()) return;
-                  setLoading(true);
-                  try {
-                    const result = await lovable.auth.signInWithOAuth("google", {
-                      redirect_uri: window.location.origin,
-                    });
-                    if (result.error) {
-                      toast.error(result.error.message || 'Google sign-in failed');
-                    }
-                    if (result.redirected) return;
-                  } catch (err: any) {
-                    toast.error(err.message || 'Google sign-in failed');
-                  } finally {
-                    setLoading(false);
-                  }
+                onClick={() => {
+                  if (!guardPrivacy(() => signInWithProvider('google'))) return;
+                  signInWithProvider('google');
                 }}
                 disabled={loading}
               >
@@ -222,22 +233,9 @@ const Auth = () => {
                 type="button"
                 variant="outline"
                 className="w-full"
-                onClick={async () => {
-                  if (!guardPrivacy()) return;
-                  setLoading(true);
-                  try {
-                    const result = await lovable.auth.signInWithOAuth("apple", {
-                      redirect_uri: window.location.origin,
-                    });
-                    if (result.error) {
-                      toast.error(result.error.message || 'Apple sign-in failed');
-                    }
-                    if (result.redirected) return;
-                  } catch (err: any) {
-                    toast.error(err.message || 'Apple sign-in failed');
-                  } finally {
-                    setLoading(false);
-                  }
+                onClick={() => {
+                  if (!guardPrivacy(() => signInWithProvider('apple'))) return;
+                  signInWithProvider('apple');
                 }}
                 disabled={loading}
               >
