@@ -248,18 +248,33 @@ const Auth = () => {
               </Button>
             </div>
 
-            <div className="mt-4 text-center">
+            <div className="mt-4 text-center space-y-2">
               <button
                 onClick={() => setIsLogin(!isLogin)}
-                className="text-sm text-primary hover:underline font-medium"
+                className="text-sm text-primary hover:underline font-medium block w-full"
               >
                 {isLogin ? "Don't have an account? Sign Up" : 'Already have an account? Sign In'}
+              </button>
+              <button
+                type="button"
+                onClick={() => { setPrivacyReadonly(true); setShowPrivacy(true); }}
+                className="text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1"
+              >
+                <Shield className="w-3 h-3" />
+                View Privacy Policy
               </button>
             </div>
 
           </CardContent>
         </Card>
       </div>
+
+      <PrivacyPolicy
+        open={showPrivacy}
+        onAccept={acceptPrivacy}
+        onClose={() => setShowPrivacy(false)}
+        requireAcceptance={!privacyAccepted && !privacyReadonly}
+      />
     </div>
   );
 };
