@@ -7,7 +7,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { Mail, Lock, Eye, EyeOff, ArrowRight, Sun, Moon } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, ArrowRight, Sun, Moon, Shield } from 'lucide-react';
+import PrivacyPolicy from '@/components/PrivacyPolicy';
+
+const PRIVACY_KEY = 'profitmate_privacy_accepted_v1';
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -16,6 +19,29 @@ const Auth = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [privacyAccepted, setPrivacyAccepted] = useState<boolean>(() => {
+    try { return localStorage.getItem(PRIVACY_KEY) === 'true'; } catch { return false; }
+  });
+  const [showPrivacy, setShowPrivacy] = useState<boolean>(() => {
+    try { return localStorage.getItem(PRIVACY_KEY) !== 'true'; } catch { return true; }
+  });
+  const [privacyReadonly, setPrivacyReadonly] = useState(false);
+
+  const acceptPrivacy = () => {
+    try { localStorage.setItem(PRIVACY_KEY, 'true'); } catch {}
+    setPrivacyAccepted(true);
+    setShowPrivacy(false);
+  };
+
+  const guardPrivacy = () => {
+    if (!privacyAccepted) {
+      setPrivacyReadonly(false);
+      setShowPrivacy(true);
+      toast.error('Please accept the Privacy Policy to continue');
+      return false;
+    }
+    return true;
+  };
 
   // Redirect to dashboard when user signs in
   useEffect(() => {
@@ -29,6 +55,7 @@ const Auth = () => {
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!guardPrivacy()) return;
     if (!email.trim() || !password.trim()) {
       toast.error('Please fill in all fields');
       return;
@@ -164,6 +191,7 @@ const Auth = () => {
                 variant="outline"
                 className="w-full"
                 onClick={async () => {
+                  if (!guardPrivacy()) return;
                   setLoading(true);
                   try {
                     const result = await lovable.auth.signInWithOAuth("google", {
@@ -195,6 +223,7 @@ const Auth = () => {
                 variant="outline"
                 className="w-full"
                 onClick={async () => {
+                  if (!guardPrivacy()) return;
                   setLoading(true);
                   try {
                     const result = await lovable.auth.signInWithOAuth("apple", {
@@ -219,18 +248,33 @@ const Auth = () => {
               </Button>
             </div>
 
-            <div className="mt-4 text-center">
+            <div className="mt-4 text-center space-y-2">
               <button
                 onClick={() => setIsLogin(!isLogin)}
-                className="text-sm text-primary hover:underline font-medium"
+                className="text-sm text-primary hover:underline font-medium block w-full"
               >
                 {isLogin ? "Don't have an account? Sign Up" : 'Already have an account? Sign In'}
+              </button>
+              <button
+                type="button"
+                onClick={() => { setPrivacyReadonly(true); setShowPrivacy(true); }}
+                className="text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1"
+              >
+                <Shield className="w-3 h-3" />
+                View Privacy Policy
               </button>
             </div>
 
           </CardContent>
         </Card>
       </div>
+
+      <PrivacyPolicy
+        open={showPrivacy}
+        onAccept={acceptPrivacy}
+        onClose={() => setShowPrivacy(false)}
+        requireAcceptance={!privacyAccepted && !privacyReadonly}
+      />
     </div>
   );
 };
