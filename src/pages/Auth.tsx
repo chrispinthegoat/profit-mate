@@ -7,7 +7,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { Mail, Lock, Eye, EyeOff, ArrowRight, Sun, Moon } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, ArrowRight, Sun, Moon, Shield } from 'lucide-react';
+import PrivacyPolicy from '@/components/PrivacyPolicy';
+
+const PRIVACY_KEY = 'profitmate_privacy_accepted_v1';
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -16,6 +19,29 @@ const Auth = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [privacyAccepted, setPrivacyAccepted] = useState<boolean>(() => {
+    try { return localStorage.getItem(PRIVACY_KEY) === 'true'; } catch { return false; }
+  });
+  const [showPrivacy, setShowPrivacy] = useState<boolean>(() => {
+    try { return localStorage.getItem(PRIVACY_KEY) !== 'true'; } catch { return true; }
+  });
+  const [privacyReadonly, setPrivacyReadonly] = useState(false);
+
+  const acceptPrivacy = () => {
+    try { localStorage.setItem(PRIVACY_KEY, 'true'); } catch {}
+    setPrivacyAccepted(true);
+    setShowPrivacy(false);
+  };
+
+  const guardPrivacy = () => {
+    if (!privacyAccepted) {
+      setPrivacyReadonly(false);
+      setShowPrivacy(true);
+      toast.error('Please accept the Privacy Policy to continue');
+      return false;
+    }
+    return true;
+  };
 
   // Redirect to dashboard when user signs in
   useEffect(() => {
