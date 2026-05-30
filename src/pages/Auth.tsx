@@ -55,6 +55,7 @@ const Auth = () => {
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!guardPrivacy()) return;
     if (!email.trim() || !password.trim()) {
       toast.error('Please fill in all fields');
       return;
