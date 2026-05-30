@@ -26,21 +26,45 @@ const Auth = () => {
     try { return localStorage.getItem(PRIVACY_KEY) !== 'true'; } catch { return true; }
   });
   const [privacyReadonly, setPrivacyReadonly] = useState(false);
+  const [pendingAction, setPendingAction] = useState<null | (() => void | Promise<void>)>(null);
 
   const acceptPrivacy = () => {
     try { localStorage.setItem(PRIVACY_KEY, 'true'); } catch {}
     setPrivacyAccepted(true);
     setShowPrivacy(false);
+    if (pendingAction) {
+      const run = pendingAction;
+      setPendingAction(null);
+      Promise.resolve(run()).catch(() => {});
+    }
   };
 
-  const guardPrivacy = () => {
+  const guardPrivacy = (queued?: () => void | Promise<void>) => {
     if (!privacyAccepted) {
       setPrivacyReadonly(false);
+      if (queued) setPendingAction(() => queued);
       setShowPrivacy(true);
       toast.error('Please accept the Privacy Policy to continue');
       return false;
     }
     return true;
+  };
+
+  const signInWithProvider = async (provider: 'google' | 'apple') => {
+    setLoading(true);
+    try {
+      const result = await lovable.auth.signInWithOAuth(provider, {
+        redirect_uri: window.location.origin,
+      });
+      if (result.error) {
+        toast.error(result.error.message || `${provider} sign-in failed`);
+      }
+      if (result.redirected) return;
+    } catch (err: any) {
+      toast.error(err.message || `${provider} sign-in failed`);
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Redirect to dashboard when user signs in
