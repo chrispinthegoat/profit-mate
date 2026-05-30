@@ -233,22 +233,9 @@ const Auth = () => {
                 type="button"
                 variant="outline"
                 className="w-full"
-                onClick={async () => {
-                  if (!guardPrivacy()) return;
-                  setLoading(true);
-                  try {
-                    const result = await lovable.auth.signInWithOAuth("apple", {
-                      redirect_uri: window.location.origin,
-                    });
-                    if (result.error) {
-                      toast.error(result.error.message || 'Apple sign-in failed');
-                    }
-                    if (result.redirected) return;
-                  } catch (err: any) {
-                    toast.error(err.message || 'Apple sign-in failed');
-                  } finally {
-                    setLoading(false);
-                  }
+                onClick={() => {
+                  if (!guardPrivacy(() => signInWithProvider('apple'))) return;
+                  signInWithProvider('apple');
                 }}
                 disabled={loading}
               >
