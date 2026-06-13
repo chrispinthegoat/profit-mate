@@ -4,7 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { AlertCircle, Star, MessageSquare, CheckCircle2, HelpCircle } from 'lucide-react';
+import { AlertCircle, Star, MessageSquare, CheckCircle2, HelpCircle, BookOpen, Package, ShoppingBag, Receipt, BarChart3, WifiOff, Mail } from 'lucide-react';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { toast } from 'sonner';
 
 const FeedbackPage = () => {
