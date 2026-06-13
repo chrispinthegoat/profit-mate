@@ -152,6 +152,7 @@ const AppShell = () => {
     { key: 'products', icon: Package, label: 'Products' },
     { key: 'sales', icon: ShoppingBag, label: t('sales') },
     { key: 'expenses', icon: Receipt, label: t('expenses') },
+    { key: 'feedback', icon: HelpCircle, label: t('feedback') },
     { key: 'settings', icon: Settings, label: t('settings') },
   ];
 
