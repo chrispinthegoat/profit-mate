@@ -125,8 +125,8 @@ const Auth = () => {
       <div className="w-full max-w-sm space-y-6">
         {/* Logo */}
         <div className="flex flex-col items-center gap-2">
-          <div className="w-14 h-14 rounded-2xl gradient-primary flex items-center justify-center shadow-lg">
-            <span className="text-primary-foreground font-display font-extrabold text-2xl">P</span>
+          <div className="w-20 h-20 rounded-2xl bg-white flex items-center justify-center shadow-lg overflow-hidden">
+            <img src={profitmateLogo.url} alt="ProfitMate logo" className="w-full h-full object-contain" />
           </div>
           <h1 className="text-2xl font-display font-extrabold text-foreground">ProfitMate</h1>
           <p className="text-sm text-muted-foreground text-center">
