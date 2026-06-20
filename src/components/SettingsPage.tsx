@@ -358,6 +358,9 @@ const SettingsPage = () => {
           </CardContent>
         )}
       </Card>
+
+      {/* Legal & About */}
+      <LegalSection />
     </div>
   );
 };
