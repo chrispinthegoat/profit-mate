@@ -6,6 +6,7 @@ import { Check, Crown, Sparkles, Phone, Copy, ChevronDown, ChevronUp, Sun, Moon,
 import { Theme } from '@/lib/store';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import LegalSection from './LegalSection';
 
 type BillingCycle = 'monthly' | 'yearly';
 
