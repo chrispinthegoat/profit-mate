@@ -13,6 +13,7 @@ import NotificationPanel from '@/components/NotificationPanel';
 import NotificationPrompt from '@/components/NotificationPrompt';
 import { Home, ShoppingBag, Receipt, Settings, HelpCircle, User, LogOut, Bell, Sun, Moon, Package } from 'lucide-react';
 import { toast } from 'sonner';
+import profitmateLogo from '@/assets/profitmate-logo.png.asset.json';
 
 type Tab = 'dashboard' | 'sales' | 'products' | 'expenses' | 'settings' | 'feedback';
 
