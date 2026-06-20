@@ -177,8 +177,8 @@ const AppShell = () => {
       <header className="sticky top-0 z-10 bg-card/90 backdrop-blur-lg border-b border-border px-4 py-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl gradient-primary flex items-center justify-center shadow-sm">
-              <span className="text-primary-foreground font-display font-extrabold text-base">P</span>
+            <div className="w-9 h-9 rounded-xl bg-white flex items-center justify-center shadow-sm overflow-hidden">
+              <img src={profitmateLogo.url} alt="ProfitMate logo" className="w-full h-full object-contain" />
             </div>
             <div>
               <h1 className="text-lg font-display font-extrabold text-foreground leading-tight">ProfitMate</h1>
